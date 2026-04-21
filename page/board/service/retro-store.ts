@@ -1,35 +1,9 @@
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  limit,
-  query,
-  serverTimestamp,
-  setDoc,
-} from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, limit, query, serverTimestamp, setDoc } from "firebase/firestore";
 import { db, firebaseEnabled } from "@/lib/firebase";
+import type { RetroBoard, RetroSection } from "@/page/board/type";
 
 const retroCollectionId = "kilshot";
 const configuredRetroDocId = process.env.NEXT_PUBLIC_RETRO_DOC_ID?.trim();
-
-export type RetroCard = {
-  id: string;
-  content: string;
-  createdAt: string;
-};
-
-export type RetroSection = {
-  id: string;
-  title: string;
-  cards: RetroCard[];
-};
-
-export type RetroBoard = {
-  sourceDocId?: string;
-  sections: RetroSection[];
-  updatedAt: string;
-};
 
 type FirestoreSection = {
   key?: string;
@@ -106,21 +80,20 @@ export async function loadBoard(): Promise<RetroBoard> {
 
   const board = {
     sourceDocId,
-    sections:
-      sectionOrder.map((section) => {
-        const sectionData = data?.[section.firestoreId] as FirestoreSection | undefined;
+    sections: sectionOrder.map((section) => {
+      const sectionData = data?.[section.firestoreId] as FirestoreSection | undefined;
 
-        return {
-          id: section.id,
-          title: sectionData?.key ?? "",
-          cards:
-            sectionData?.contents?.map((content) => ({
-              id: crypto.randomUUID(),
-              content,
-              createdAt: new Date().toISOString(),
-            })) ?? [],
-        };
-      }) ?? createEmptyBoard().sections,
+      return {
+        id: section.id,
+        title: sectionData?.key ?? "",
+        cards:
+          sectionData?.contents?.map((content) => ({
+            id: crypto.randomUUID(),
+            content,
+            createdAt: new Date().toISOString(),
+          })) ?? [],
+      };
+    }),
     updatedAt: data?.updatedAt ?? new Date().toISOString(),
   };
 

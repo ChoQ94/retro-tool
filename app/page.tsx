@@ -1,5 +1,5 @@
-import { RetrospectiveBoard } from "@/components/retrospective-board";
+import BoardPage from "@/page/board";
 
 export default function Home() {
-  return <RetrospectiveBoard />;
+  return <BoardPage />;
 }
